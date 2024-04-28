@@ -1,11 +1,10 @@
-from data import Player, randint
+from .data import Player, randint
 
 class Kantian(Player):
     """ Always cooperates. """
-    name = "Kantain"
-    # def __init__(self, score=0):
-    #     super().__init__()
-    #     self.name = "Kantian"
+    def __init__(self, score=0):
+        super().__init__()
+        self.name = "Kantian"
 
 
 class Defector(Player):
@@ -15,7 +14,7 @@ class Defector(Player):
         super().__init__()
         self.name = "Defector"
 
-    def decide_action(self):
+    def action(self, opponent):
         return False
 
 
@@ -26,18 +25,10 @@ class TitForTat(Player):
     def __init__(self, score=0):
         super().__init__()
         self.name = "Tit for Tat"
-        self.is_first_move = True
 
-    def decide_action(self):
-        if not self.is_first_move:
-            return self.opponent.last_action
-        else:
-            self.is_first_move = False
-            return True
-
-    def new_match_against(self, opponent):
-        self.is_first_move = True
-        super().new_match_against(opponent)
+    def action(self, opponent):
+        # If there is no history, the first term evaluates to True. Therefore, python short-circuits and does not touch [-1], which would produce an error.
+        return not opponent.history or opponent.history[-1]
 
 
 class TitFor2Tats(Player):
@@ -49,17 +40,16 @@ class TitFor2Tats(Player):
         self.name = "Tit for 2 Tats"
         self.opponent_last_actions = (True, True)
 
-    def decide_action(self):
-        if self.opponent.last_action is None:
+    def action(self, opponent):
+        if not opponent.history:
             self.opponent_last_actions = (self.opponent_last_actions[1], True)
         else:
             self.opponent_last_actions =\
-                (self.opponent_last_actions[1], self.opponent.last_action)
+                (self.opponent_last_actions[1], opponent.history[-1])
         return self.opponent_last_actions[0] or self.opponent_last_actions[1]
 
-    def new_match_against(self, opponent):
+    def init_match(self):
         self.opponent_last_actions = (True, True)
-        super().new_match_against(opponent)
 
 
 class MeanTitForTat(TitForTat):
@@ -69,11 +59,11 @@ class MeanTitForTat(TitForTat):
         super().__init__()
         self.name = "Mean Tit for Tat"
 
-    def decide_action(self):
+    def action(self, opponent):
         if not randint(0, 5):
             return False
         else:
-            return super().decide_action()
+            return super().action(opponent)
 
 
 class WaryTitForTat(TitForTat):
@@ -83,12 +73,11 @@ class WaryTitForTat(TitForTat):
         super().__init__()
         self.name = "Wary Tit for Tat"
 
-    def decide_action(self):
-        if self.is_first_move:
-            self.is_first_move = False
+    def action(self, opponent):
+        if not opponent.history:
             return False
         else:
-            return super().decide_action()
+            return super().action(opponent)
 
 
 class Tester(TitForTat):
@@ -103,26 +92,25 @@ class Tester(TitForTat):
         self.testing_turn = 0
         self.opponent_retaliated = False
 
-    def decide_action(self):
+    def action(self, opponent):
         self.turn += 1
         if self.testing_turn == 0 and not randint(0, 5):
             self.testing_turn += 1
             return False
         elif 0 < self.testing_turn <= 1:
             self.testing_turn += 1
-            if not self.opponent.last_action:
+            if not opponent.history[-1]:
                 self.opponent_retaliated = True
             return True
         elif self.testing_turn > 1 and not self.opponent_retaliated:
             return self.turn % 2
         else:
-            return super().decide_action()
+            return super().action(opponent)
 
-    def new_match_against(self, opponent):
+    def init_match(self):
         self.turn = 0
         self.testing_turn = 0
         self.opponent_retaliated = False
-        return super().new_match_against(opponent)
 
 
 class Conniver(TitForTat):
@@ -135,24 +123,23 @@ class Conniver(TitForTat):
         self.testing_turn = 0
         self.opponent_retaliated = False
 
-    def decide_action(self):
+    def action(self, opponent):
         if self.testing_turn == 0 and not randint(0, 5):
             self.testing_turn += 1
             return False
         elif 0 < self.testing_turn <= 2:
             self.testing_turn += 1
-            if not self.opponent.last_action:
+            if not opponent.history[-1]:
                 self.opponent_retaliated = True
             return True
         elif self.testing_turn > 2 and not self.opponent_retaliated:
             return False
         else:
-            return super().decide_action()
+            return super().action(opponent)
 
-    def new_match_against(self, opponent):
+    def init_match(self):
         self.testing_turn = 0
         self.opponent_retaliated = False
-        return super().new_match_against(opponent)
 
 
 class Grudger(Player):
@@ -163,14 +150,15 @@ class Grudger(Player):
         self.name = "Grudger"
         self.opponent_never_defected = True
 
-    def decide_action(self):
-        if not self.opponent.last_action:
+    def action(self, opponent):
+        if not opponent.history:
+            return True
+        if not opponent.history[-1]:
             self.opponent_never_defected = False
         return self.opponent_never_defected
 
-    def new_match_against(self, opponent):
+    def init_match(self):
         self.opponent_never_defected = True
-        super().new_match_against(opponent)
 
 
 class Pavlovian(Player):
@@ -182,7 +170,7 @@ class Pavlovian(Player):
         self.name = "Pavlovian"
         self.last_score = 0
 
-    def decide_action(self):
+    def action(self, opponent):
         temp = self.last_score
         self.last_score = self.score
         if self.score > temp:
@@ -190,9 +178,8 @@ class Pavlovian(Player):
         else:
             return not self.last_action
 
-    def new_match_against(self, opponent):
+    def init_match(self):
         self.last_action = True
-        super().new_match_against(opponent)
 
 
 class ClanGrunt(Player):
@@ -219,7 +206,7 @@ class Random(Player):
         super().__init__()
         self.name = "Random"
 
-    def decide_action(self):
+    def action(self, opponent):
         return randint(0, 1)
 
 all_strategies = {

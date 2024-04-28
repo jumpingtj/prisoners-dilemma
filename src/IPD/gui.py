@@ -5,12 +5,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, \
     NavigationToolbar2Tk
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
-from main import run_simulation
+from .main import run_simulation
 
-
-class NavigationToolbar(NavigationToolbar2Tk):
-    def _zoom_pan_handler(self, event):
-        return
 
 class SimulationGUI(Frame):
     def __init__(self, parent):
@@ -142,7 +138,7 @@ class SimulationGUI(Frame):
         self.canvas = FigureCanvasTkAgg(self.fig, self.graph_frame)
         self.plot_filler()
         self.canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
-        toolbar = NavigationToolbar(self.canvas, self.graph_frame)
+        toolbar = NavigationToolbar2Tk(self.canvas, self.graph_frame)
         toolbar.update()
         self.canvas._tkcanvas.pack()
 

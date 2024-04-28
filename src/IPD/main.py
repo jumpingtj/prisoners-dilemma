@@ -1,6 +1,10 @@
-from profiles import *
+from .strategies import all_strategies
+from .profiles import *
 import numpy as np
 import matplotlib.pyplot as plt
+from copy import deepcopy
+from .data import Population
+from .play import *
 
 NUM_GENS = 35
 NUM_ROUNDS = 100
@@ -11,8 +15,9 @@ def run_simulation(init_profile: dict, num_gens, num_rounds):
     dist = {
         'gens': np.linspace(1, num_gens, num_gens)
     }
-    init_gen = populationize(init_profile)
+    init_gen = populate(init_profile)
     init_dist = init_gen.distribution()
+    # print(init_dist)
     for strat in init_profile:
         dist[strat] = np.zeros(num_gens)
         dist[strat][0] = init_dist[strat]
@@ -38,13 +43,13 @@ def plot(simulation_results: dict):
     plt.show()
 
 
-def populationize(input_dict):
+def populate(input_dict):
     """ Example --
     >>> sample_dict = {
             'Kantian': 2,
             'Defector': 1
         }
-    >>> sample_population = populationize(sample_dict)
+    >>> sample_population = populate(sample_dict)
 
     is the same as doing:
 

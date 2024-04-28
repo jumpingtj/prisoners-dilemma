@@ -4,7 +4,7 @@ def play_round(p1, p2):
         Both defect                 -> both +1 pts
         One cooperates, one defects -> cooperator +0 pts, defector +3 pts
     """
-    p1_action, p2_action = p1.action(), p2.action()
+    p1_action, p2_action = p1._action(p2), p2._action(p1)
 
     if p1_action and p2_action:
         p1.add_points(2)
@@ -17,13 +17,13 @@ def play_round(p1, p2):
         p1.add_points(1)
         p2.add_points(1)
 
-    p1.update_last_action()
-    p2.update_last_action()
+    p1.update_history()
+    p2.update_history()
 
 
 def play_several_rounds(p1, p2, num_rounds):
-    p1.new_match_against(p2)
-    p2.new_match_against(p1)
+    p1._match_reset()
+    p2._match_reset()
     for i in range(num_rounds):
         play_round(p1, p2)
 

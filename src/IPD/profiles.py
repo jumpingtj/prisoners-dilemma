@@ -1,4 +1,4 @@
-from strategies import *
+from .strategies import *
 
 
 def diverse():

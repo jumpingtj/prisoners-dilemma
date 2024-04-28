@@ -10,24 +10,28 @@ class Player(object):
         self.this_action = None
         self.opponent = None
 
-    def new_match_against(self, opponent):
-        self.last_action = None
-        self.this_action = None
-        self.opponent = opponent
+    def _match_reset(self):
+        self.history = []
+        self.score = 0
+        self.init_match()
+
+    def init_match(self):
+        """Runs before the start of a new match. Reset any variables here!
+        """
+        pass
 
     def reset_score(self):
         self.score = 0
 
-    def action(self):
-        self.this_action = self.decide_action()
+    def _action(self, opponent):
+        self.this_action = self.action(opponent)
         return self.this_action
 
-    def decide_action(self):
+    def action(self, opponent):
         return True
 
-    def update_last_action(self):
-        self.last_action = self.this_action
-        self.this_action = None
+    def update_history(self):
+        self.history.append(self.this_action)
 
     def add_points(self, points):
         self.score += points
