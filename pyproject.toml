@@ -1,5 +1,5 @@
 [project]
-name = "IPD"
+name = "IPD-axelrod"
 version = "1.0.0"
 authors = [
   { name="jumpingtj" },
