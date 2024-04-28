@@ -1,20 +1,4 @@
-from data import *
-
-all_strategies = {
-    'Kantian': Kantian(),
-    'Defector': Defector(),
-    'Tit for Tat': TitForTat(),
-    'Tit for 2 Tats': TitFor2Tats(),
-    'Mean Tit for Tat': MeanTitForTat(),
-    'Wary Tit for Tat': WaryTitForTat(),
-    'Tester': Tester(),
-    'Conniver': Conniver(),
-    'Grudger': Grudger(),
-    'Pavlovian': Pavlovian(),
-    'Clan Grunt': ClanGrunt(),
-    'Clan Leader': ClanLeader(),
-    'Random': Random()
-}
+from .strategies import *
 
 
 def diverse():
