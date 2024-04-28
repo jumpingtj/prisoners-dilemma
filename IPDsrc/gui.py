@@ -2,7 +2,7 @@ from tkinter import Tk, Frame, IntVar, Button, Label, Menu, Canvas, Entry, TclEr
 import matplotlib
 matplotlib.use('TkAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, \
-    NavigationToolbar2TkAgg
+    NavigationToolbar2Tk
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 from main import run_simulation
@@ -138,7 +138,7 @@ class SimulationGUI(Frame):
         self.canvas = FigureCanvasTkAgg(self.fig, self.graph_frame)
         self.plot_filler()
         self.canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
-        toolbar = NavigationToolbar2TkAgg(self.canvas, self.graph_frame)
+        toolbar = NavigationToolbar2Tk(self.canvas, self.graph_frame)
         toolbar.update()
         self.canvas._tkcanvas.pack()
 
@@ -169,7 +169,7 @@ class SimulationGUI(Frame):
         self.f = self.fig.add_subplot(111)
         self.f.plot()
         self.set_graph_params()
-        self.canvas.show()
+        self.canvas.draw()
 
     def reset(self):
         self.plot_filler()
@@ -210,7 +210,7 @@ class SimulationGUI(Frame):
             self.f.plot(x_axis, result[strat], label=strat)
         self.set_graph_params()
         self.f.legend()
-        self.canvas.show()
+        self.canvas.draw()
 
     def quit_app(self):
         self.parent.quit()
