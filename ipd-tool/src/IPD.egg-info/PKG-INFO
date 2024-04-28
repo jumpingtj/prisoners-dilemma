@@ -1,0 +1,16 @@
+Metadata-Version: 2.1
+Name: IPD
+Version: 0.0.1
+Summary: A tool for the iterated prisoners dilemma
+Author: jumpingtj
+Project-URL: Homepage, https://github.com/jumpingtj/prisoners-dilemma
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+# IDP - the tool for study of the Iterated Prisoners Dilemma
+
+This currently provides no exports and is just a test.

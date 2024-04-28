@@ -1,0 +1,12 @@
+LICENSE
+README.md
+pyproject.toml
+src/IPD/__init__.py
+src/IPD/data.py
+src/IPD/gui.py
+src/IPD/main.py
+src/IPD/profiles.py
+src/IPD.egg-info/PKG-INFO
+src/IPD.egg-info/SOURCES.txt
+src/IPD.egg-info/dependency_links.txt
+src/IPD.egg-info/top_level.txt
