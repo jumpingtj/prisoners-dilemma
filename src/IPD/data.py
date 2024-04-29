@@ -1,14 +1,22 @@
 from copy import deepcopy
-from random import randint
+from random import Random, randint
 
 
-class Player(object):
+class Player:
+    first = None
+    name = "Unknown"
     def __init__(self, score=0):
-        self.name = None
         self.score = score
         self.last_action = None
         self.this_action = None
         self.opponent = None
+
+    def setup(self, random_instance=None, noise=0):
+        if random_instance:
+            self._random = random_instance
+        else:
+            self._random = Random()
+        self.noise = noise
 
     def _match_reset(self):
         self.history = []
@@ -23,8 +31,12 @@ class Player(object):
     def reset_score(self):
         self.score = 0
 
-    def _action(self, opponent):
-        self.this_action = self.action(opponent)
+    def _action(self, opponent, first=False):
+        if first and self.first != None:
+            self.this_action = self.first
+        else:
+            self.this_action = self.action(opponent)
+        self.this_action = self.this_action ^ (self._random.random() < self.noise)
         return self.this_action
 
     def action(self, opponent):
@@ -36,12 +48,17 @@ class Player(object):
     def add_points(self, points):
         self.score += points
 
+    def random(self, prob):
+        return self._random.random() < prob
+
 
 # -------------------------------------------------- #
 
-class Population(object):
-    def __init__(self, members: list):
+class Population:
+    def __init__(self, members: list, noise=0):
         self.members = members
+        for m in self.members:
+            m.setup(noise=noise)
 
     def __repr__(self):
         return "{}".format(self.members)
@@ -114,4 +131,3 @@ class Population(object):
             prop = dist[member] / total_num_players * 100
             dist[member] = '%.2f' % prop
         return dist
-

@@ -1,10 +1,15 @@
+from itertools import combinations_with_replacement
+
 def play_round(p1, p2):
     """ Payoffs:
         Both cooperate              -> both +2 pts
         Both defect                 -> both +1 pts
         One cooperates, one defects -> cooperator +0 pts, defector +3 pts
     """
-    p1_action, p2_action = p1._action(p2), p2._action(p1)
+    if not p1.history:
+        p1_action, p2_action = p1._action(p2, True), p2._action(p1, True)
+    else:
+        p1_action, p2_action = p1._action(p2), p2._action(p1)
 
     if p1_action and p2_action:
         p1.add_points(2)
@@ -33,7 +38,5 @@ def round_robin(population, num_rounds):
     of the population for num_rounds each.
     """
     if not population.is_empty():
-        other_members = population.excluding(population.first_member())
-        for member in other_members:
-            play_several_rounds(population.first_member(), member, num_rounds)
-        round_robin(other_members, num_rounds)
+        for match in combinations_with_replacement(population, 2):
+            play_several_rounds(match[0], match[1], num_rounds)

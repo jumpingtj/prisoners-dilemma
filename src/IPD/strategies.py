@@ -1,4 +1,5 @@
-from .data import Player, randint
+from .data import Player
+
 
 class Kantian(Player):
     """ Always cooperates. """
@@ -21,85 +22,51 @@ class Defector(Player):
 class TitForTat(Player):
     """Starts by cooperating. After that, always cooperates unless
     opponent's last move was defect."""
-
-    def __init__(self, score=0):
-        super().__init__()
-        self.name = "Tit for Tat"
+    first = True
+    name = "Tit for Tat"
 
     def action(self, opponent):
-        # If there is no history, the first term evaluates to True. Therefore, python short-circuits and does not touch [-1], which would produce an error.
-        return not opponent.history or opponent.history[-1]
+        return opponent.history[-1]
 
 
 class TitFor2Tats(Player):
     """Starts by cooperating. After that, always cooperates unless
     opponent's last two moves were defect."""
-
-    def __init__(self, score=0):
-        super().__init__()
-        self.name = "Tit for 2 Tats"
-        self.opponent_last_actions = (True, True)
+    first = True
+    name = "Tit for 2 Tats"
 
     def action(self, opponent):
-        if not opponent.history:
-            self.opponent_last_actions = (self.opponent_last_actions[1], True)
-        else:
-            self.opponent_last_actions =\
-                (self.opponent_last_actions[1], opponent.history[-1])
-        return self.opponent_last_actions[0] or self.opponent_last_actions[1]
-
-    def init_match(self):
-        self.opponent_last_actions = (True, True)
+        return not (opponent.history[-3:-1] == [False, False])
 
 
 class MeanTitForTat(TitForTat):
     """ Tit for Tat, but occasionally defects. """
-
-    def __init__(self, score=0):
-        super().__init__()
-        self.name = "Mean Tit for Tat"
+    name = "Mean Tit for Tat"
 
     def action(self, opponent):
-        if not randint(0, 5):
-            return False
-        else:
-            return super().action(opponent)
+        return self.random(4/5) and super().action(opponent)
 
 
 class WaryTitForTat(TitForTat):
     """ Tit for Tat, but starts by defecting. """
-
-    def __init__(self, score=0):
-        super().__init__()
-        self.name = "Wary Tit for Tat"
-
-    def action(self, opponent):
-        if not opponent.history:
-            return False
-        else:
-            return super().action(opponent)
+    name = "Wary Tit for Tat"
+    first = False
 
 
 class Tester(TitForTat):
     """ Tit for 2 Tats exploiter. Tit for Tat, but occasionally defects
     then cooperates for a turn. If the opponent doesn't retaliate immediately,
     alternates between cooperating and defecting. """
-
-    def __init__(self, score=0):
-        super().__init__()
-        self.name = "Tester"
-        self.turn = 0
-        self.testing_turn = 0
-        self.opponent_retaliated = False
+    name = "Tester"
 
     def action(self, opponent):
         self.turn += 1
-        if self.testing_turn == 0 and not randint(0, 5):
+        if self.testing_turn == 0 and self.random(1/5):
             self.testing_turn += 1
             return False
         elif 0 < self.testing_turn <= 1:
             self.testing_turn += 1
-            if not opponent.history[-1]:
+            if opponent.history and not opponent.history[-1]:
                 self.opponent_retaliated = True
             return True
         elif self.testing_turn > 1 and not self.opponent_retaliated:
@@ -117,19 +84,15 @@ class Conniver(TitForTat):
     """ Kantian exploiter. Tit for Tat, but occasionally defects then cooperates
     for 2 turns. If opponent doesn't retaliate within 2 turns, defects until end. """
 
-    def __init__(self, score=0):
-        super().__init__()
-        self.name = "Conniver"
-        self.testing_turn = 0
-        self.opponent_retaliated = False
+    name = "Conniver"
 
     def action(self, opponent):
-        if self.testing_turn == 0 and not randint(0, 5):
+        if self.testing_turn == 0 and self.random(1/5):
             self.testing_turn += 1
             return False
         elif 0 < self.testing_turn <= 2:
             self.testing_turn += 1
-            if not opponent.history[-1]:
+            if opponent.history and not opponent.history[-1]:
                 self.opponent_retaliated = True
             return True
         elif self.testing_turn > 2 and not self.opponent_retaliated:
@@ -144,15 +107,10 @@ class Conniver(TitForTat):
 
 class Grudger(Player):
     """ Cooperates until opponent defects. """
-
-    def __init__(self, score=0):
-        super().__init__()
-        self.name = "Grudger"
-        self.opponent_never_defected = True
+    first = True
+    name = "Grudger"
 
     def action(self, opponent):
-        if not opponent.history:
-            return True
         if not opponent.history[-1]:
             self.opponent_never_defected = False
         return self.opponent_never_defected
@@ -202,12 +160,25 @@ class ClanLeader(Player):
 
 class Random(Player):
     """ Cooperates or defects at 50/50. """
+
     def __init__(self, score=0):
         super().__init__()
         self.name = "Random"
 
     def action(self, opponent):
-        return randint(0, 1)
+        return self.random(1/2)
+
+
+class Grofman(Player):
+    """Cooperates on the first turn. Then"""
+
+    def __init__(self, score=0):
+        super().__init__()
+        self.name = "Grofman"
+
+    def action(self, opponent):
+        return len(self.history) == 0 or self.history[-1] == opponent.history[-1] or self.random(2 / 7)
+
 
 all_strategies = {
     'Kantian': Kantian(),
@@ -222,5 +193,6 @@ all_strategies = {
     'Pavlovian': Pavlovian(),
     'Clan Grunt': ClanGrunt(),
     'Clan Leader': ClanLeader(),
-    'Random': Random()
+    'Random': Random(),
+    'Grofman': Grofman()
 }

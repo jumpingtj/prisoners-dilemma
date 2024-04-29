@@ -11,11 +11,11 @@ NUM_ROUNDS = 100
 INITIAL_PROFILE = defectors_with_some_tft()
 
 
-def run_simulation(init_profile: dict, num_gens, num_rounds):
+def run_simulation(init_profile: dict, num_gens, num_rounds, noise):
     dist = {
         'gens': np.linspace(1, num_gens, num_gens)
     }
-    init_gen = populate(init_profile)
+    init_gen = populate(init_profile, noise)
     init_dist = init_gen.distribution()
     # print(init_dist)
     for strat in init_profile:
@@ -43,7 +43,7 @@ def plot(simulation_results: dict):
     plt.show()
 
 
-def populate(input_dict):
+def populate(input_dict, noise=0):
     """ Example --
     >>> sample_dict = {
             'Kantian': 2,
@@ -63,7 +63,7 @@ def populate(input_dict):
         else:
             for i in range(input_dict[strategy]):
                 profile.append(deepcopy(all_strategies[strategy]))
-    return Population(profile)
+    return Population(profile, noise)
 
 
 def update_gen_dist(curr_gen, num_rounds):
